@@ -29,11 +29,7 @@ const Index = () => {
     return { fat, gastos, lucro, roas, roi, margem };
   }, [faturamento, gastoMeta, gastoGoogle]);
 
-  // Static demo values for non-calculated fields
   const vendasPendentes = 1850;
-  const vendasReembolsadas = 420;
-  const imposto = 1875;
-  const chargeback = 0.8;
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,7 +38,7 @@ const Index = () => {
 
       <main className="p-6 space-y-6 max-w-[1400px] mx-auto">
         {/* KPI Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <KpiCard
             title="Faturamento Líquido"
             value={formatCurrency(metrics.fat)}
@@ -81,22 +77,6 @@ const Index = () => {
             value={formatPercent(metrics.margem)}
             color={metrics.margem >= 0 ? "success" : "destructive"}
             tooltip="Percentual de lucro sobre faturamento"
-          />
-          <KpiCard
-            title="Vendas Reembolsadas"
-            value={formatCurrency(vendasReembolsadas)}
-            tooltip="Total de vendas reembolsadas"
-          />
-          <KpiCard
-            title="Imposto"
-            value={formatCurrency(imposto)}
-            tooltip="Valor estimado de impostos"
-          />
-          <KpiCard
-            title="Chargeback"
-            value={formatPercent(chargeback)}
-            color={chargeback > 1 ? "destructive" : "default"}
-            tooltip="Percentual de chargebacks"
           />
         </div>
 
