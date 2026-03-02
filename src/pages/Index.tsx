@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardFilters from "@/components/DashboardFilters";
 import KpiCard from "@/components/KpiCard";
 import DailyEntryForm from "@/components/DailyEntryForm";
+import { supabase } from "@/integrations/supabase/client";
 
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -12,9 +13,35 @@ const formatPercent = (value: number) =>
 
 const Index = () => {
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [faturamento, setFaturamento] = useState("12500");
-  const [gastoMeta, setGastoMeta] = useState("5200");
-  const [gastoGoogle, setGastoGoogle] = useState("3800");
+  const [faturamento, setFaturamento] = useState("0");
+  const [gastoMeta, setGastoMeta] = useState("0");
+  const [gastoGoogle, setGastoGoogle] = useState("0");
+
+  const loadEntry = useCallback(async (selectedDate: string) => {
+    const { data } = await supabase
+      .from("daily_entries")
+      .select("*")
+      .eq("date", selectedDate)
+      .maybeSingle();
+
+    if (data) {
+      setFaturamento(String(data.faturamento));
+      setGastoMeta(String(data.gasto_meta));
+      setGastoGoogle(String(data.gasto_google));
+    } else {
+      setFaturamento("0");
+      setGastoMeta("0");
+      setGastoGoogle("0");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadEntry(date);
+  }, [date, loadEntry]);
+
+  const handleDateChange = (newDate: string) => {
+    setDate(newDate);
+  };
 
   const metrics = useMemo(() => {
     const fat = parseFloat(faturamento) || 0;
@@ -86,10 +113,11 @@ const Index = () => {
           faturamento={faturamento}
           gastoMeta={gastoMeta}
           gastoGoogle={gastoGoogle}
-          onDateChange={setDate}
+          onDateChange={handleDateChange}
           onFaturamentoChange={setFaturamento}
           onGastoMetaChange={setGastoMeta}
           onGastoGoogleChange={setGastoGoogle}
+          onSaved={() => loadEntry(date)}
         />
       </main>
     </div>

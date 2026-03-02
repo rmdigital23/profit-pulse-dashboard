@@ -14,7 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_entries: {
+        Row: {
+          created_at: string
+          date: string
+          faturamento: number
+          gasto_google: number
+          gasto_meta: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          faturamento?: number
+          gasto_google?: number
+          gasto_meta?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          faturamento?: number
+          gasto_google?: number
+          gasto_meta?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
