@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DailyEntryFormProps {
   date: string;
@@ -13,14 +14,38 @@ interface DailyEntryFormProps {
   onFaturamentoChange: (v: string) => void;
   onGastoMetaChange: (v: string) => void;
   onGastoGoogleChange: (v: string) => void;
+  onSaved?: () => void;
 }
 
 const DailyEntryForm = ({
   date, faturamento, gastoMeta, gastoGoogle,
   onDateChange, onFaturamentoChange, onGastoMetaChange, onGastoGoogleChange,
+  onSaved,
 }: DailyEntryFormProps) => {
-  const handleSave = () => {
+  const handleSave = async () => {
+    const fat = parseFloat(faturamento) || 0;
+    const meta = parseFloat(gastoMeta) || 0;
+    const google = parseFloat(gastoGoogle) || 0;
+
+    const { error } = await supabase
+      .from("daily_entries")
+      .upsert(
+        {
+          date,
+          faturamento: fat,
+          gasto_meta: meta,
+          gasto_google: google,
+        },
+        { onConflict: "date" }
+      );
+
+    if (error) {
+      toast.error("Erro ao salvar: " + error.message);
+      return;
+    }
+
     toast.success("Dados salvos com sucesso!");
+    onSaved?.();
   };
 
   return (
